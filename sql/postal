@@ -1,0 +1,9 @@
+    postal_code       text, -- varchar(20)
+    place_name        text, -- varchar(180)
+    place_slug        text, -- varchar(180)
+    admin_code1       text, -- 1. order subdivision (state) varchar(20)
+    admin_code2       text, -- 2. order subdivision (county/province) varchar(20)
+    admin_code3       text, -- 3. order subdivision (community) varchar(20)
+    latitude          text, -- estimated latitude (wgs84)
+    longitude         text, -- estimated longitude (wgs84)
+    accuracy          text -- accuracy of lat/lng from 1=estimated to 6=centroid

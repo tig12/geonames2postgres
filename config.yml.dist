@@ -1,0 +1,19 @@
+
+# Absolute path to directory containing a local copy of geonames country files
+# (that contain lists of cities and administrative subdivisions of the country)
+# These files can be downloaded from http://download.geonames.org/export/dump/
+dir-countries: /home/thierry/share/data/geo/geonames/countries
+
+# Absolute path to directory containing a local copy of geonames postal files
+# (that contain postal code informations)
+# These files can be downloaded from http://download.geonames.org/export/zip/
+dir-postal: /home/thierry/share/data/geo/geonames/postal
+
+postgresql: 
+    dbhost: localhost
+    dbport: 5432
+    dbuser: my_postgres_user
+    dbpassword: my_postgres_password
+    dbname: my_postgres_database
+    dbname: geo
+
