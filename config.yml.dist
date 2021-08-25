@@ -1,11 +1,11 @@
 
 # Absolute path to directory containing a local copy of geonames country files
-# (that contain lists of cities and administrative subdivisions of the country)
+# (contains lists of cities and administrative subdivisions of the country)
 # These files can be downloaded from http://download.geonames.org/export/dump/
 dir-countries: /path/to/countries
 
 # Absolute path to directory containing a local copy of geonames postal files
-# (that contain postal code informations)
+# (contains postal code informations)
 # These files can be downloaded from http://download.geonames.org/export/zip/
 dir-postal: /path/to/postal
 

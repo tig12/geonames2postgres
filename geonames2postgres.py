@@ -1,3 +1,4 @@
+
 #!/usr/bin/python
 # -*- encoding: utf8 -*-
 """
@@ -13,6 +14,7 @@
 """
 import sys
 import os
+import io
 from os.path import abspath, dirname
 from pprint import pprint, pformat
 import csv; csv.field_size_limit(1000000000)
@@ -39,7 +41,7 @@ from microtime import microtime
 import DB
 
 yamlfile = dir_root + DS + 'config.yml'
-yamlarray = yaml.load(file(yamlfile, 'r'), Loader=yaml.BaseLoader)
+yamlarray = yaml.load(open(yamlfile, 'r'), Loader=yaml.BaseLoader)
 
 dbgeo, curgeo = DB.get_postgresql_link(yamlarray['postgresql'])
 
@@ -115,8 +117,8 @@ def perform_action(action):
     # perform actions
     for country in actions:
         if country not in countries:
-            print "ERROR : Unable to import country " + country
-            print "(missing file " + dir_countries + DS + country + ".zip)"
+            print("ERROR : Unable to import country " + country)
+            print("(missing file " + dir_countries + DS + country + ".zip)")
             continue
         postal = True if country in postals else False
         import_country(country, postal)
@@ -170,14 +172,14 @@ def import_country(country, do_postal):
         # create schema if needed
         curgeo.execute("select nspname from pg_namespace where nspname=%s", (schema,))
         if len(curgeo.fetchall()) == 0:
-            print "create schema %s" % schema
+            print("create schema %s" % schema)
             curgeo.execute("create schema %s" % (schema,))
         curgeo.execute("set schema %s",(schema,))
         create_country_tables(do_postal)
         dbgeo.commit()
         t2 = microtime(True)
         dt = t2 - t1
-        print country, "created tables in", round(dt, 2), "s"
+        print(country, "created tables in", round(dt, 2), "s")
     curgeo.execute("set schema %s",(schema,))
     #
     if do_import_cities:
@@ -186,7 +188,7 @@ def import_country(country, do_postal):
         # extract and read
         myzip = ZipFile(dir_countries + DS + country + '.zip', 'r')
         filename = country + '.txt'
-        csvreader = csv.reader(myzip.open(filename), delimiter='\t')
+        csvreader = csv.reader(io.TextIOWrapper(myzip.open(filename)), delimiter='\t')
         myzip.close()
         try:
             for row in csvreader:
@@ -203,12 +205,12 @@ def import_country(country, do_postal):
                     pass
         except:
             dbgeo.rollback()
-            print "ERROR in country", country, ':', sys.exc_info()[1], '- database NOT affected for this country'
+            print("ERROR in country", country, ':', sys.exc_info()[1], '- database NOT affected for this country')
             raise
         dbgeo.commit()
         t2 = microtime(True)
         dt = t2 - t1
-        print country, "imported cities + adm in", round(dt, 2), "s"
+        print(country, "imported cities + adm in", round(dt, 2), "s")
     #
     if do_import_postal and do_postal:
     #
@@ -216,7 +218,7 @@ def import_country(country, do_postal):
         # extract and read
         myzip = ZipFile(dir_postal + DS + country + '.zip', 'r')
         filename = country + '.txt'
-        csvreader = csv.reader(myzip.open(filename), delimiter='\t')
+        csvreader = csv.reader(io.TextIOWrapper(myzip.open(filename)), delimiter='\t')
         myzip.close()
         try:
             for row in csvreader:
@@ -226,12 +228,12 @@ def import_country(country, do_postal):
                 import_postal(cur)
         except :
             dbgeo.rollback()
-            print "ERROR in country", country, ':', sys.exc_info()[1], '- database NOT affected for this country'
+            print("ERROR in country", country, ':', sys.exc_info()[1], '- database NOT affected for this country')
             raise
         dbgeo.commit()
         t2 = microtime(True)
         dt = t2 - t1
-        print country, "imported postal in", round(dt, 2), "s"
+        print(country, "imported postal in", round(dt, 2), "s")
     #
     if do_merge_postal and do_postal:
     #
@@ -258,24 +260,31 @@ def import_country(country, do_postal):
         t2 = microtime(True)
         dt = t2 - t1
         ntotal = ngood + nbad
-        print country, "merged postal in", round(dt, 2), "s -", 'nb of merged postal codes :', ngood, '/', ntotal
+        print(country, "merged postal in", round(dt, 2), "s -", 'nb of merged postal codes :', ngood, '/', ntotal)
 
 
 # **************************************
 def import_postal(row):
     ''' Stores one postal code (= one row of table postal) '''
-#    pprint(row)
-#    sys.exit()
+    # these variables are necessary fo AD
+    postal_code = row.get('postal_code', '')
+    place_name = row.get('place_name', '')
+    admin_code1 = row.get('admin_code1', '')
+    admin_code2 = row.get('admin_code2', '')
+    admin_code3 = row.get('admin_code3', '')
+    latitude = row.get('latitude', '')
+    longitude = row.get('longitude', '')
+    accuracy = row.get('accuracy', '')
     curgeo.execute("insert into postal values(%s, %s, %s, %s, %s, %s, %s, %s, %s)",(
-        row['postal_code'],
-        row['place_name'],
-        dirify(row['place_name']),
-        row['admin_code1'],
-        row['admin_code2'],
-        row['admin_code3'],
-        row['latitude'],
-        row['longitude'],
-        row['accuracy']
+        postal_code,
+        place_name,
+        dirify(place_name),
+        admin_code1,
+        admin_code2,
+        admin_code3,
+        latitude,
+        longitude,
+        accuracy
     ))
 
 
@@ -342,14 +351,14 @@ def import_adm(row):
 
 # **************************************
 def dump(row):
-    print row['geonameid'].ljust(10), row['feature_class'], row['feature_code'].ljust(5), row['name'].ljust(30), row['admin1_code'].ljust(10), row['admin2_code'].ljust(10), row['admin3_code'].ljust(10), row['admin4_code'].ljust(10), row['population'].ljust(10)
+    print(row['geonameid'].ljust(10), row['feature_class'], row['feature_code'].ljust(5), row['name'].ljust(30), row['admin1_code'].ljust(10), row['admin2_code'].ljust(10), row['admin3_code'].ljust(10), row['admin4_code'].ljust(10), row['population'].ljust(10))
 
 
 # **************************************
 if __name__ == '__main__':
     def main():
         if len(sys.argv) != 2:
-            print USAGE
+            print(USAGE)
             sys.exit()
         perform_action(sys.argv[1])
     main()

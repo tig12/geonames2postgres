@@ -51,7 +51,7 @@ def dirify(s, replace='-'):
 # ************************************************************************************
 if __name__ == '__main__':
     def test_dirify():
-        print dirify("un éléphant, , '76''' (ça trompe) énormément...")
+        print(dirify("un éléphant, , '76''' (ça trompe) énormément..."))
     #test_dirify()
     
 

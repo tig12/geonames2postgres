@@ -88,7 +88,7 @@ def remove_accents(s):
         'ý' : 'y',
         'ÿ' : 'y',
     }
-    for k in convert.keys():
+    for k in list(convert.keys()):
         s = s.replace(k, convert[k])
     return s
 # end remove_accents
@@ -100,7 +100,7 @@ def remove_accents(s):
 if __name__ == '__main__':
     
     def test_remove_accents():
-        print remove_accents("avé des àccents, ç plùs dur Øòó")
+        print(remove_accents("avé des àccents, ç plùs dur Øòó"))
     test_remove_accents()
     
 
